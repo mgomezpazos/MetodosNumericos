@@ -181,3 +181,5 @@ for d in range(1, len(S) + 1):
         print(f"El valor de d que mantiene el error por debajo del 10% es: {d}")
         break
     
+
+    ##hola
