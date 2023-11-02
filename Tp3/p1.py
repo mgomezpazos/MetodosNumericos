@@ -25,6 +25,8 @@ U, S, VT = np.linalg.svd(matriz_datos, full_matrices=False)
 # Nueva representación de baja dimensión (por ejemplo, considerando las primeras k columnas)
 k = 5  # Número de componentes principales a mantener (ajusta según tu necesidad)
 representacion_baja_dimension = U[:, -k:] @ np.diag(S[-k:])
+## jere nos lo cambio -k: es para agarrar los de abajo
+##:k es para agarrar los de arriba, hay que poner los dos :)
 
 # Reconstruir las imágenes a partir de la representación de baja dimensión
 imagen_reconstruida = representacion_baja_dimension @ VT[-k:, :]
