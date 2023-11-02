@@ -23,11 +23,11 @@ matriz_datos = np.stack(matrices_imagenes)  # Asegurarse de usar np.stack para c
 U, S, VT = np.linalg.svd(matriz_datos, full_matrices=False)
 
 # Nueva representación de baja dimensión (por ejemplo, considerando las primeras k columnas)
-k = 25  # Número de componentes principales a mantener (ajusta según tu necesidad)
-representacion_baja_dimension = U[:, :k] @ np.diag(S[:k])
+k = 5  # Número de componentes principales a mantener (ajusta según tu necesidad)
+representacion_baja_dimension = U[:, -k:] @ np.diag(S[-k:])
 
 # Reconstruir las imágenes a partir de la representación de baja dimensión
-imagen_reconstruida = representacion_baja_dimension @ VT[:k, :]
+imagen_reconstruida = representacion_baja_dimension @ VT[-k:, :]
 
 # Mostrar las imágenes originales y las reconstrucciones lado a lado
 num_imagenes = len(imagenes)
@@ -161,25 +161,3 @@ for i, sim_matrix in enumerate(similaridades):
 plt.subplots_adjust(wspace=0.5)  # Ajusta el espacio entre subtramas
 plt.show()
 
-#1.4?
-# Cargar la imagen
-imagen_elegida = cv2.imread('img00.jpeg', cv2.IMREAD_GRAYSCALE)
-
-# Descomposición SVD para la imagen elegida
-U, S, VT = np.linalg.svd(imagen_elegida, full_matrices=False)
-
-# Calcular el error para distintos valores de d
-for d in range(1, len(S) + 1):
-    # Representación de baja dimensión
-    representacion_baja_dimension = U[:, :d] @ np.diag(S[:d]) @ VT[:d, :]
-
-    # Calcular el error entre la imagen original y la reconstruida
-    error = np.linalg.norm(imagen_elegida - representacion_baja_dimension, 'fro') / np.linalg.norm(imagen_elegida, 'fro')
-
-    # Si el error es menor al 10%, se ha alcanzado el valor mínimo de d
-    if error < 0.1:
-        print(f"El valor de d que mantiene el error por debajo del 10% es: {d}")
-        break
-    
-
-    ##hola
