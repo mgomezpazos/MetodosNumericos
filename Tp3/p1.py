@@ -3,8 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import cosine_similarity
 
-#1.1
-# Directorio que contiene las imágenes
+#Ejercicio 1.1 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 directorio_imagenes = ['img00.jpeg', 'img01.jpeg', 'img02.jpeg', 'img03.jpeg', 'img04.jpeg', 'img05.jpeg', 'img06.jpeg', 'img07.jpeg', 'img08.jpeg',
                        'img09.jpeg', 'img10.jpeg', 'img11.jpeg', 'img12.jpeg', 'img13.jpeg', 'img14.jpeg', 'img15.jpeg']
 
@@ -15,48 +14,19 @@ for img_path in directorio_imagenes:
     if img is not None:
         imagenes.append(img)
 
-# Convertir imágenes a matrices y apilarlas
+# Convertimos las imágenes a matrices y las apilamos
 matrices_imagenes = [img.flatten() for img in imagenes]
 matriz_datos = np.stack(matrices_imagenes) 
 
 # Aplicamos SVD a la matriz original
 U, S, VT = np.linalg.svd(matriz_datos, full_matrices=False)
 
-# Nueva representación de baja dimensión (considerando las ultimas k columnas)
+#Representación considerando las primeras k columnas----------------------------------------------------------------
 k = 5  # Número de autovalores que se mantendrán
-representacion_baja_dimension_ultimas_dimensiones = U[:, -k:] @ np.diag(S[-k:])
-
-# Reconstruimos las imágenes a partir de la representación de baja dimensión
-imagen_reconstruida = representacion_baja_dimension_ultimas_dimensiones @ VT[-k:, :]
-
-# Mostrar las imágenes originales y las reconstrucciones lado a lado
-num_imagenes = len(imagenes)
-fig, axs = plt.subplots(2, num_imagenes, figsize=(20, 8))
-titulo_original = axs[0, 0].set_title('Imágenes Originales', fontsize=12)
-titulo_original.set_position([1.1, 2.5])
-axs[0, 0].axis('off')
-titulo_reconstruido = axs[1, 0].set_title('Reconstruidas con últimas dimensiones(k = {})'.format(k), fontsize=12)
-titulo_reconstruido.set_position([0.1, 0.1])
-axs[1, 0].axis('off')
-
-for i in range(num_imagenes):
-    axs[0, i].imshow(imagenes[i], cmap='gray')
-    axs[0, i].axis('off')
-    reconstruccion = imagen_reconstruida[i, :].reshape(imagenes[i].shape)
-    axs[1, i].imshow(reconstruccion, cmap='gray')
-    axs[1, i].axis('off')
-
-plt.tight_layout()
-plt.show()
-
-
-# Nueva representación de baja dimensión (considerando las primeras k columnas)
-k = 5  # Número de componentes principales a mantener (ajusta según tu necesidad)
 representacion_baja_dimension_primeras_dimensiones = U[:, :k] @ np.diag(S[:k])
-# Reconstruir las imágenes a partir de la representación de baja dimensión
-imagen_reconstruida2 = representacion_baja_dimension_primeras_dimensiones @ VT[:k, :]
-
-# Mostrar las imágenes originales y las reconstrucciones lado a lado
+# Reconstruimos las imágenes
+imagen_reconstruida_primeras = representacion_baja_dimension_primeras_dimensiones @ VT[:k, :]
+#ploteos
 num_imagenes = len(imagenes)
 fig, axs = plt.subplots(2, num_imagenes, figsize=(20, 8))
 titulo_original = axs[0, 0].set_title('Imágenes Originales', fontsize=12)
@@ -69,48 +39,65 @@ axs[1, 0].axis('off')
 for i in range(num_imagenes):
     axs[0, i].imshow(imagenes[i], cmap='gray')
     axs[0, i].axis('off')
-    reconstruccion = imagen_reconstruida[i, :].reshape(imagenes[i].shape)
+    reconstruccion = imagen_reconstruida_primeras[i, :].reshape(imagenes[i].shape)
     axs[1, i].imshow(reconstruccion, cmap='gray')
     axs[1, i].axis('off')
 
 plt.tight_layout()
 plt.show()
 
+#Representación considerando las ultimas k columnas-----------------------------------------------------------------
+k = 5  # Número de autovalores que se mantendrán
+representacion_baja_dimension_ultimas_dimensiones = U[:, -k:] @ np.diag(S[-k:])
+# Recontruimos las imagenes
+imagen_reconstruida_ultimas = representacion_baja_dimension_ultimas_dimensiones @ VT[-k:, :]
+#ploteos
+num_imagenes = len(imagenes)
+fig, axs = plt.subplots(2, num_imagenes, figsize=(20, 8))
+titulo_original = axs[0, 0].set_title('Imágenes Originales', fontsize=12)
+titulo_original.set_position([1.1, 2.5])
+axs[0, 0].axis('off')
+titulo_reconstruido = axs[1, 0].set_title('Reconstruidas con últimas dimensiones(k = {})'.format(k), fontsize=12)
+titulo_reconstruido.set_position([0.1, 0.1])
+axs[1, 0].axis('off')
 
-
-
-# Visualizar solo la primera imagen y su reconstrucción en más detalle (caso de ultimas dimensiones)
-fig_individual, axs_individual = plt.subplots(1, 2, figsize=(8, 4))
-
-# Título para la imagen original individual
-titulo_original_individual = axs_individual[0].set_title('Imagen Original', fontsize=10)
-axs_individual[0].imshow(imagenes[0], cmap='gray')
-axs_individual[0].axis('off')
-
-# Reajustar la forma de la imagen reconstruida a la original y mostrarla
-reconstruccion_individual = imagen_reconstruida[0, :].reshape(imagenes[0].shape)
-titulo_reconstruido_individual = axs_individual[1].set_title('Reconstrucción con ultimas dimensiones(k = {})'.format(k), fontsize=10)
-axs_individual[1].imshow(reconstruccion_individual, cmap='gray')
-axs_individual[1].axis('off')
+for i in range(num_imagenes):
+    axs[0, i].imshow(imagenes[i], cmap='gray')
+    axs[0, i].axis('off')
+    reconstruccion = imagen_reconstruida_ultimas[i, :].reshape(imagenes[i].shape)
+    axs[1, i].imshow(reconstruccion, cmap='gray')
+    axs[1, i].axis('off')
 
 plt.tight_layout()
 plt.show()
 
-# Visualizar solo la primera imagen y su reconstrucción en más detalle (caso de primeras dimensiones)
+#visualización individual de la reconstrucción para las primeras dimensiones (primera foto)----------------------------------------------
 fig_individual, axs_individual = plt.subplots(1, 2, figsize=(8, 4))
 titulo_original_individual = axs_individual[0].set_title('Imagen Original', fontsize=10)
 axs_individual[0].imshow(imagenes[0], cmap='gray')
 axs_individual[0].axis('off')
-reconstruccion_individual = imagen_reconstruida2[0, :].reshape(imagenes[0].shape)
+reconstruccion_individual = imagen_reconstruida_primeras[0, :].reshape(imagenes[0].shape)
 titulo_reconstruido_individual = axs_individual[1].set_title('Reconstrucción con primeras dimensiones(k = {})'.format(k), fontsize=10)
 axs_individual[1].imshow(reconstruccion_individual, cmap='gray')
 axs_individual[1].axis('off')
+plt.tight_layout()
+plt.show()
 
+#visualización individual de la reconstrucción para las ultimas dimensiones (primera foto)---------------------------------------------
+fig_individual, axs_individual = plt.subplots(1, 2, figsize=(8, 4))
+titulo_original_individual = axs_individual[0].set_title('Imagen Original', fontsize=10)
+axs_individual[0].imshow(imagenes[0], cmap='gray')
+axs_individual[0].axis('off')
+reconstruccion_individual = imagen_reconstruida_ultimas[0, :].reshape(imagenes[0].shape)
+titulo_reconstruido_individual = axs_individual[1].set_title('Reconstrucción con ultimas dimensiones(k = {})'.format(k), fontsize=10)
+axs_individual[1].imshow(reconstruccion_individual, cmap='gray')
+axs_individual[1].axis('off')
 plt.tight_layout()
 plt.show()
 
 
-#1.2
+
+#Ejercicio 1.2------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Mapa de calor para la matriz S (valores singulares)
 plt.figure(figsize=(6, 4))
 plt.title('Mapa de calor de la matriz S')
