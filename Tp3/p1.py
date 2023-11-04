@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import cosine_similarity
 
-#Ejercicio 1.1 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Ejercicio 1.1/2?-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 directorio_imagenes = ['img00.jpeg', 'img01.jpeg', 'img02.jpeg', 'img03.jpeg', 'img04.jpeg', 'img05.jpeg', 'img06.jpeg', 'img07.jpeg', 'img08.jpeg',
                        'img09.jpeg', 'img10.jpeg', 'img11.jpeg', 'img12.jpeg', 'img13.jpeg', 'img14.jpeg', 'img15.jpeg']
 
@@ -26,15 +26,10 @@ k = 5  # Número de autovalores que se mantendrán
 representacion_baja_dimension_primeras_dimensiones = U[:, :k] @ np.diag(S[:k])
 # Reconstruimos las imágenes
 imagen_reconstruida_primeras = representacion_baja_dimension_primeras_dimensiones @ VT[:k, :]
-#ploteos
+
+# Ploteos de las imágenes reconstruidas con las primeras k columnas
 num_imagenes = len(imagenes)
 fig, axs = plt.subplots(2, num_imagenes, figsize=(20, 8))
-titulo_original = axs[0, 0].set_title('Imágenes Originales', fontsize=12)
-titulo_original.set_position([1.1, 2.5])
-axs[0, 0].axis('off')
-titulo_reconstruido = axs[1, 0].set_title('Reconstruidas con primeras dimensiones(k = {})'.format(k), fontsize=12)
-titulo_reconstruido.set_position([1.1, 2.5])
-axs[1, 0].axis('off')
 
 for i in range(num_imagenes):
     axs[0, i].imshow(imagenes[i], cmap='gray')
@@ -43,33 +38,30 @@ for i in range(num_imagenes):
     axs[1, i].imshow(reconstruccion, cmap='gray')
     axs[1, i].axis('off')
 
-plt.tight_layout()
-plt.show()
+# Añadir títulos a las subtramas
+fig.suptitle("Imágenes Originales y Reconstruidas con Primeras Dimensiones k=5", fontsize=16)
+fig.tight_layout(rect=[0, 0.03, 1, 0.95])
 
 #Representación considerando las ultimas k columnas-----------------------------------------------------------------
 k = 5  # Número de autovalores que se mantendrán
 representacion_baja_dimension_ultimas_dimensiones = U[:, -k:] @ np.diag(S[-k:])
 # Recontruimos las imagenes
 imagen_reconstruida_ultimas = representacion_baja_dimension_ultimas_dimensiones @ VT[-k:, :]
-#ploteos
-num_imagenes = len(imagenes)
-fig, axs = plt.subplots(2, num_imagenes, figsize=(20, 8))
-titulo_original = axs[0, 0].set_title('Imágenes Originales', fontsize=12)
-titulo_original.set_position([1.1, 2.5])
-axs[0, 0].axis('off')
-titulo_reconstruido = axs[1, 0].set_title('Reconstruidas con últimas dimensiones(k = {})'.format(k), fontsize=12)
-titulo_reconstruido.set_position([0.1, 0.1])
-axs[1, 0].axis('off')
+# Ploteos de las imágenes reconstruidas con las últimas k columnas
+fig2, axs2 = plt.subplots(2, num_imagenes, figsize=(20, 8))
 
 for i in range(num_imagenes):
-    axs[0, i].imshow(imagenes[i], cmap='gray')
-    axs[0, i].axis('off')
+    axs2[0, i].imshow(imagenes[i], cmap='gray')
+    axs2[0, i].axis('off')
     reconstruccion = imagen_reconstruida_ultimas[i, :].reshape(imagenes[i].shape)
-    axs[1, i].imshow(reconstruccion, cmap='gray')
-    axs[1, i].axis('off')
+    axs2[1, i].imshow(reconstruccion, cmap='gray')
+    axs2[1, i].axis('off')
 
-plt.tight_layout()
+# Añadir títulos a las subtramas
+fig2.suptitle("Imágenes Originales y Reconstruidas con Últimas Dimensiones", fontsize=16)
+fig2.tight_layout(rect=[0, 0.03, 1, 0.95])
 plt.show()
+
 
 #visualización individual de la reconstrucción para las primeras dimensiones (primera foto)----------------------------------------------
 fig_individual, axs_individual = plt.subplots(1, 2, figsize=(8, 4))
@@ -82,6 +74,7 @@ axs_individual[1].imshow(reconstruccion_individual, cmap='gray')
 axs_individual[1].axis('off')
 plt.tight_layout()
 plt.show()
+
 
 #visualización individual de la reconstrucción para las ultimas dimensiones (primera foto)---------------------------------------------
 fig_individual, axs_individual = plt.subplots(1, 2, figsize=(8, 4))
@@ -96,9 +89,8 @@ plt.tight_layout()
 plt.show()
 
 
-
-#Ejercicio 1.2------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# Mapa de calor para la matriz S (valores singulares)
+#Ejercicio 1.2?------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Mapa de calor para la matriz S original (valores singulares)
 plt.figure(figsize=(6, 4))
 plt.title('Mapa de calor de la matriz S')
 plt.imshow(np.diag(S), cmap='viridis', aspect='auto')
@@ -107,7 +99,7 @@ plt.xlabel('Componentes')
 plt.ylabel('Componentes')
 plt.show()
 
-# Mapa de calor para la matriz VT (transpuesta de V)
+# Mapa de calor para la matriz VT original(transpuesta de V)
 plt.figure(figsize=(6, 4))
 plt.title('Mapa de calor de la matriz VT')
 plt.imshow(VT, cmap='viridis', aspect='auto')
@@ -116,7 +108,7 @@ plt.xlabel('Componentes')
 plt.ylabel('Características')
 plt.show()
 
-# Mapa de calor para la matriz U
+# Mapa de calor para la matriz U original
 plt.figure(figsize=(6, 4))
 plt.title('Mapa de calor de la matriz U')
 plt.imshow(U, cmap='viridis', aspect='auto')
@@ -127,8 +119,7 @@ plt.show()
 
 U_reconstruido, S_reconstruido, VT_reconstruido = np.linalg.svd(representacion_baja_dimension_ultimas_dimensiones, full_matrices=False)
 
-
-# Mapa de calor para la matriz U (baja dimensión)
+# Mapa de calor para la matriz U reconstruido(baja dimensión)
 plt.figure(figsize=(6, 4))
 plt.title('Mapa de calor de la matriz U (baja dimensión)')
 plt.imshow(U_reconstruido, cmap='viridis', aspect='auto')
@@ -137,7 +128,7 @@ plt.xlabel('Componentes')
 plt.ylabel('Imágenes')
 plt.show()
 
-# Mapa de calor para la matriz S (baja dimensión)
+# Mapa de calor para la matriz S reconstruida(baja dimensión)
 plt.figure(figsize=(6, 4))
 plt.title('Mapa de calor de la matriz S (baja dimensión)')
 plt.imshow(np.diag(S_reconstruido), cmap='viridis', aspect='auto')
@@ -146,7 +137,7 @@ plt.xlabel('Componentes')
 plt.ylabel('Componentes')
 plt.show()
 
-# Mapa de calor para la matriz VT (baja dimensión)
+# Mapa de calor para la matriz VT reconstruida (baja dimensión)
 plt.figure(figsize=(6, 4))
 plt.title('Mapa de calor de la matriz VT (baja dimensión)')
 plt.imshow(VT_reconstruido, cmap='viridis', aspect='auto')
@@ -156,7 +147,7 @@ plt.ylabel('Características')
 plt.show()
 
 
-#1.3
+#Ejercicio 1.3 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Crear una lista para almacenar las similitudes para diferentes valores de d
 similaridades = []
 
@@ -186,3 +177,43 @@ for i, sim_matrix in enumerate(similaridades):
 plt.subplots_adjust(wspace=0.5)  # Ajusta el espacio entre subtramas
 plt.show()
 
+
+#1.4---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Obtener la imagen original
+imagen_original = imagenes[0]  # Supongamos que seleccionamos la primera imagen
+
+# Calcular la compresión a distintas dimensiones y encontrar la mínima 'd'
+error_umbral = 0.1  # 10% de error
+
+U, S, VT = np.linalg.svd(imagen_original, full_matrices=False)
+
+error = 1.0
+d = 1
+while error > error_umbral and d < len(S):
+    representacion_baja_dim = U[:, :d] @ np.diag(S[:d]) @ VT[:d, :]
+    error = np.linalg.norm(imagen_original - representacion_baja_dim, 'fro') / np.linalg.norm(imagen_original, 'fro')
+    d += 1
+
+# Ahora 'd' es la mínima dimensión con un error inferior al 10%
+print(f"La mínima dimensión 'd' con un error por debajo del 10% es: {d}")
+
+# Aplicar la misma transformación a todas las imágenes
+imagenes_comprimidas = []
+for img in imagenes:
+    U_img, S_img, VT_img = np.linalg.svd(img, full_matrices=False)
+    representacion_baja_dim = U_img[:, :d] @ np.diag(S_img[:d]) @ VT_img[:d, :]
+    imagenes_comprimidas.append(representacion_baja_dim)
+
+# Visualizar alguna imagen original y su compresión
+fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+
+axs[0].imshow(imagen_original, cmap='gray')
+axs[0].set_title('Imagen Original')
+axs[0].axis('off')
+
+axs[1].imshow(imagenes_comprimidas[0], cmap='gray')
+axs[1].set_title(f'Compresión con d={d}')
+axs[1].axis('off')
+
+plt.tight_layout()
+plt.show()
