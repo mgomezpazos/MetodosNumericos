@@ -52,7 +52,6 @@ for d in dims:
 
 #2.2---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Muestra las dimensiones más representativas con respecto a las dimensiones reducidas obtenidas por SVD
-# Muestra las dimensiones más representativas con respecto a las dimensiones reducidas obtenidas por SVD
 for d in dims:
     # Selecciona las dimensiones VT correspondientes a la reducción d
     VT_reduced = VT[:d, :]
@@ -70,12 +69,27 @@ for d in dims:
     print()
 
 
-#1.3-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# Carga de datos etiquetas
+#2.3-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Carga de datos del dataset X y las etiquetas Y
+X = pd.read_csv('dataset02.csv').values
 Y = pd.read_csv('y2.txt').values
-Y = Y.T  # Transpone Y para ajustar las dimensiones
+Y = Y.reshape(-1, 1)  # Asegura que Y sea de dimensiones (n, 1)
 
-# Realiza la reducción de dimensionalidad y análisis
+# Encuentra la fila problemática (si las dimensiones no coinciden)
+if X.shape[0] != Y.shape[0]:
+    # Identifica la fila que está causando la incompatibilidad
+    problem_row_index = None
+    if X.shape[0] > Y.shape[0]:
+        problem_row_index = X.shape[0] - 1  # Última fila de X
+    else:
+        problem_row_index = Y.shape[0] - 1  # Última fila de Y
+
+    # Elimina la fila problemática de la matriz X
+    X = np.delete(X, problem_row_index, axis=0)
+
+# Continuar con el análisis con las dimensiones compatibles entre X y Y
+dims = [2, 5, 10, 20]  # Define las dimensiones a probar
+
 min_error = float('inf')
 best_d = 0
 

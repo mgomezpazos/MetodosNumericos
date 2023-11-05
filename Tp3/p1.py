@@ -179,41 +179,78 @@ plt.show()
 
 
 #1.4---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# Obtener la imagen original
-imagen_original = imagenes[0]  # Supongamos que seleccionamos la primera imagen
+# Cargar una imagen
+imagen = cv2.imread('img00.jpeg', cv2.IMREAD_GRAYSCALE)
 
-# Calcular la compresión a distintas dimensiones y encontrar la mínima 'd'
-error_umbral = 0.1  # 10% de error
+# Realizar la Descomposición de Valores Singulares (SVD) de la imagen
+U, S, VT = np.linalg.svd(imagen, full_matrices=False)
 
-U, S, VT = np.linalg.svd(imagen_original, full_matrices=False)
+# Valor deseado para d (número de componentes principales)
+d = 8
 
-error = 1.0
-d = 1
-while error > error_umbral and d < len(S):
-    representacion_baja_dim = U[:, :d] @ np.diag(S[:d]) @ VT[:d, :]
-    error = np.linalg.norm(imagen_original - representacion_baja_dim, 'fro') / np.linalg.norm(imagen_original, 'fro')
-    d += 1
+# Tomar los primeros 'd' autovalores y componentes principales para comprimir la imagen
+U_d = U[:, :d]
+S_d = np.diag(S[:d])
+VT_d = VT[:d, :]
 
-# Ahora 'd' es la mínima dimensión con un error inferior al 10%
-print(f"La mínima dimensión 'd' con un error por debajo del 10% es: {d}")
+# Proyectar la imagen original en un espacio de baja dimensión utilizando los 'd' componentes principales
+imagen_comprimida = np.dot(np.dot(U_d, S_d), VT_d)
 
-# Aplicar la misma transformación a todas las imágenes
-imagenes_comprimidas = []
-for img in imagenes:
-    U_img, S_img, VT_img = np.linalg.svd(img, full_matrices=False)
-    representacion_baja_dim = U_img[:, :d] @ np.diag(S_img[:d]) @ VT_img[:d, :]
-    imagenes_comprimidas.append(representacion_baja_dim)
+# Reconstruir la imagen comprimida
+imagen_comprimida = imagen_comprimida.reshape(imagen.shape)
 
-# Visualizar alguna imagen original y su compresión
-fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+# Mostrar la imagen original y la imagen comprimida
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1)
+plt.imshow(imagen, cmap='gray')
+plt.title('Imagen Original')
+plt.axis('off')
 
-axs[0].imshow(imagen_original, cmap='gray')
-axs[0].set_title('Imagen Original')
-axs[0].axis('off')
-
-axs[1].imshow(imagenes_comprimidas[0], cmap='gray')
-axs[1].set_title(f'Compresión con d={d}')
-axs[1].axis('off')
+plt.subplot(1, 2, 2)
+plt.imshow(imagen_comprimida, cmap='gray')
+plt.title(f'Imagen Comprimida (d={d})')
+plt.axis('off')
 
 plt.tight_layout()
+plt.show()
+
+# Suponiendo que 'imagenes' es el conjunto de imágenes
+n_imagenes = len(imagenes)
+
+# Crear una lista para almacenar las representaciones de baja dimensión de cada imagen
+representaciones_baja_dim = []
+
+# Calcular la compresión a distintas dimensiones y encontrar la mínima 'd' con un error inferior al 10%
+error_umbral = 0.1  # 10% de error
+
+U, S, VT = np.linalg.svd(imagenes[0], full_matrices=False)
+d_optimo = 0
+V_optimo=[]
+for d in range(1, 29):
+    representacion_baja_dim = U[:, :d] @ np.diag(S[:d]) @ VT[:d, :]
+    error = np.linalg.norm(imagenes[0] - representacion_baja_dim, 'fro') / np.linalg.norm(imagenes[0], 'fro')
+    if error < error_umbral and d_optimo == 0:
+        d_optimo = d
+        VT_optimo = VT[:d, :]
+        V_optimo = VT_optimo.T
+
+
+
+print(V_optimo.shape)
+# multiplicar por V_optimo cada imagen
+representaciones_baja_dim = []
+for imagen_original in imagenes:
+    representacion_baja_dim = imagen_original @ V_optimo
+    representaciones_baja_dim.append(representacion_baja_dim)
+
+#plot all img_V
+fig, axs = plt.subplots(4, 4, figsize=(20, 10))
+for i in range(4):
+    for j in range(4):
+        axs[i, j].imshow(representaciones_baja_dim[i*4+j], cmap='gray')
+        print(representaciones_baja_dim[i*4+j].shape)
+        #title d=i
+        axs[i, j].set_title(f'img{i*4+j}')
+        axs[i, j].axis('off')
+        
 plt.show()
