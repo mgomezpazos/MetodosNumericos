@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+import seaborn as sns
 
 # Carga el conjunto de datos
 data = pd.read_csv('dataset02.csv')
@@ -12,42 +14,45 @@ dims = [2, 4, 6, 20, X.shape[1]]  # Incluye la dimensionalidad original (p)
 # Definir el valor de sigma para calcular la similitud
 sigma = 1.0  # Puedes ajustar este valor
 
-# Realiza la reducción de dimensionalidad y análisis
-for d in dims:
+# Gráfico para todas las proyecciones
+plt.figure(figsize=(15, 10))
+
+for i, d in enumerate(dims, 1):
     # Calcula la SVD de X
     U, S, VT = np.linalg.svd(X, full_matrices=False)
     
     # Reduce la dimensionalidad seleccionando las d componentes principales
     X_reduced = np.dot(U[:, :d], np.dot(np.diag(S[:d]), VT[:d, :]))
     
-    # Plotea las proyecciones en el nuevo espacio reducido
-    plt.figure(figsize=(6, 6))
-    plt.scatter(X_reduced[:, 0], X_reduced[:, 1], c='b', marker='o', alpha=0.5)
-    plt.title(f'Dimensión reducida d={d}')
-    plt.show()
+    plt.subplot(2, 3, i)
+    plt.scatter(X_reduced[:, 0], X_reduced[:, 1], c='violet', marker='o', alpha=0.5)
+    plt.xlabel('Componente principal 1')
+    plt.ylabel('Componente principal 2')
 
-# Similitud entre muestras en el espacio original y reducido
-for d in dims:
-    # Calcula la similitud en el espacio original
-    similarity_original = np.exp(-np.sum((X[:, None, :] - X) ** 2, axis=2) / (2.0 * sigma**2))
-    
+plt.tight_layout(w_pad=4, h_pad=4)
+plt.show()
+
+fig, axs = plt.subplots(2, 3, figsize=(15, 10))
+
+# Calcula la similitud en el espacio original
+similarity_original = np.exp(-np.sum((X[:, None, :] - X) ** 2, axis=2) / (2.0 * sigma**2))
+axs[0, 0].scatter(X[:, 0], X[:, 1], c='violet', marker='o', alpha=0.5)
+axs[0, 0].set_xlabel('Dimensión 1')
+axs[0, 0].set_ylabel('Dimensión 2')
+
+# Muestra las comparaciones para diferentes d utilizando SVD
+for i, d in enumerate([2, 4, 6, 20, 107], 1):
     # Calcula la similitud en el espacio reducido (usando SVD)
     U, S, VT = np.linalg.svd(X, full_matrices=False)
     X_reduced = np.dot(U[:, :d], np.dot(np.diag(S[:d]), VT[:d, :]))
     similarity_reduced = np.exp(-np.sum((X_reduced[:, None, :] - X_reduced) ** 2, axis=2) / (2.0 * sigma**2))
-    
-    # Plotea las similitudes como gráficos de dispersión
-    plt.figure(figsize=(12, 6))
-    
-    plt.subplot(1, 2, 1)
-    plt.scatter(X[:, 0], X[:, 1], c='b', marker='o', alpha=0.5)
-    plt.title('Similitud Espacio Original')
-    
-    plt.subplot(1, 2, 2)
-    plt.scatter(X_reduced[:, 0], X_reduced[:, 1], c='b', marker='o', alpha=0.5)
-    plt.title(f'Similitud Espacio Reducido (d={d})')
-    
-    plt.show()
+
+    axs[i // 3, i % 3].scatter(X_reduced[:, 0], X_reduced[:, 1], c='violet', marker='o', alpha=0.5)
+    axs[i // 3, i % 3].set_xlabel('Componente principal 1')
+    axs[i // 3, i % 3].set_ylabel('Componente principal 2')
+
+plt.tight_layout()
+plt.show()
 
 
 #2.2---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -61,13 +66,9 @@ for d in dims:
 
     # Ordena las dimensiones en orden descendente según su importancia
     sorted_dims = np.argsort(avg_abs)[::-1]
-
-    print(f"Dimensiones más importantes para d={d} según SVD:")
     for i in range(min(5, len(sorted_dims))):  # Muestra las 5 dimensiones más importantes o las disponibles
         print(f"Dimensión {sorted_dims[i]} - Importancia: {avg_abs[sorted_dims[i]]}")
-
     print()
-
 
 #2.3-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Carga de datos del dataset X y las etiquetas Y
@@ -93,7 +94,7 @@ dims = [2, 5, 10, 20]  # Define las dimensiones a probar
 min_error = float('inf')
 best_d = 0
 
-for d in dims:
+for i, d in enumerate(dims, 1):
     # Calcula la SVD de X
     U, S, VT = np.linalg.svd(X, full_matrices=False)
     
@@ -106,19 +107,88 @@ for d in dims:
     predictions = np.dot(X_reduced, beta)
     
     # Calcula el error de predicción
-    error = np.linalg.norm(predictions - Y)**2
+    error = np.linalg.norm(predictions - Y) ** 2
     
     # Guarda el mejor d basado en el error
     if error < min_error:
         min_error = error
         best_d = d
 
-    # Plotea las proyecciones en el nuevo espacio reducido
-    plt.figure(figsize=(6, 6))
-    plt.scatter(X_reduced[:, 0], X_reduced[:, 1], c='b', marker='o', alpha=0.5)
-    plt.title(f'Dimensión reducida d={d}')
-    plt.show()
-
 # Muestra el mejor d y el error mínimo
 print(f"La mejor d que minimiza el error es: {best_d}")
 print(f"El mínimo error es: {min_error}")
+
+
+errors = []  # Almacenar los errores para cada d
+for d in dims:
+    U, S, VT = np.linalg.svd(X, full_matrices=False)
+    X_reduced = np.dot(U[:, :d], np.dot(np.diag(S[:d]), VT[:d, :]))
+    beta = np.linalg.lstsq(X_reduced, Y, rcond=None)[0]
+    predictions = np.dot(X_reduced, beta)
+    error = np.linalg.norm(predictions - Y)**2
+    errors.append(error)
+
+# Gráfico de error vs. Dimensionalidad
+plt.figure(figsize=(8, 6))
+plt.plot(dims, errors, marker='o')
+plt.xlabel('Dimensionalidad (d)')
+plt.ylabel('Error de Predicción')
+plt.show()
+
+errors = []  # Almacenar los errores para cada d
+for d in dims:
+    U, S, VT = np.linalg.svd(X, full_matrices=False)
+    X_reduced = np.dot(U[:, :d], np.dot(np.diag(S[:d]), VT[:d, :]))
+    beta = np.linalg.lstsq(X_reduced, Y, rcond=None)[0]
+    predictions = np.dot(X_reduced, beta)
+    error = np.linalg.norm(predictions - Y) ** 2
+    errors.append(error)
+
+# Gráfico de histogramas para los errores
+plt.figure(figsize=(10, 6))
+plt.hist(errors, bins=10, alpha=0.7, color='skyblue')
+plt.xlabel('Error de Predicción')
+plt.ylabel('Frecuencia')
+plt.show()
+
+betas = []  # Almacenar los coeficientes beta para cada d
+for d in dims:
+    U, S, VT = np.linalg.svd(X, full_matrices=False)
+    X_reduced = np.dot(U[:, :d], np.dot(np.diag(S[:d]), VT[:d, :]))
+    beta = np.linalg.lstsq(X_reduced, Y, rcond=None)[0]
+    betas.append(beta)
+
+# Crear un gráfico de barras para mostrar los coeficientes beta
+num_attributes = X.shape[1]
+plt.figure(figsize=(12, 6))
+
+for i, beta in enumerate(betas):
+    plt.bar(np.arange(num_attributes) + i * 0.2, beta.flatten(), width=0.2, label=f'd={dims[i]}')
+plt.xlabel('Atributos')
+plt.ylabel('Valor del Coeficiente beta')
+plt.legend()
+plt.show()
+
+# Suponiendo que tienes X_reduced para diferentes valores de d
+dims = [2, 4, 6]  # Valores de d
+data = {}  # Un diccionario para almacenar los datos de X_reduced
+
+# Genera datos de ejemplo (reemplaza esto con tus datos reales)
+for d in dims:
+    # Genera datos aleatorios para X_reduced (solo como ejemplo)
+    n_samples = 1000
+    X_reduced = np.random.rand(n_samples, d)  # Suponiendo que 'X_reduced' es una matriz de forma (n_samples, d)
+    data[f'd={d}'] = X_reduced
+
+# Ploteo de gráficos de densidad
+fig, axs = plt.subplots(1, len(dims), figsize=(15, 5))
+
+for i, d in enumerate(dims):
+    # Gráfico de densidad
+    sns.kdeplot(data=data[f'd={d}'][:, 0], fill=True, color='blue', ax=axs[i])
+    sns.kdeplot(data=data[f'd={d}'][:, 1], fill=True, color='red', ax=axs[i])
+    axs[i].set_xlabel('Valores')
+    axs[i].set_ylabel('Densidad')
+
+plt.tight_layout()
+plt.show()
