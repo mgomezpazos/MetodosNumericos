@@ -138,3 +138,30 @@ plt.ylabel("Error")
 plt.plot(num_iterations, error_F2, label="Error (F2)", alpha=0.7)
 plt.legend()
 plt.show()
+
+# Realizar un estudio variando delta_squared
+delta_squared_values = [1e-4, 1e-2, 1,50,100,1000,15000]  # Valores de delta_squared a probar
+
+errors_F2_varied = []  # Almacenar los errores para cada valor de delta_squared
+solutions_F2_varied = []  # Almacenar las soluciones para cada valor de delta_squared
+
+for delta_squared_val in delta_squared_values:
+    solution_F2_varied = gradient_descent(cost_function_F2, initial_guess, learning_rate, iterations, delta_squared_val)
+    solutions_F2_varied.append(solution_F2_varied)
+
+    # Calcular los errores respecto al mínimo encontrado por el método para F2 variado
+    cost_values_F2_varied = [cost_function_F2(sol, delta_squared_val) for sol in gradient_descent_tracking(
+        cost_function_F2, initial_guess, learning_rate, iterations, delta_squared_val)]
+    errors_F2_varied.append(np.array(cost_values_F2_varied) - cost_function_F2(solution_F2_varied, delta_squared_val))
+
+# Graficar la convergencia del error para F2 con diferentes delta_squared
+plt.figure(figsize=(10, 6))
+plt.title("Convergencia del error con diferentes delta_squared (F2)")
+plt.xlabel("Iteración")
+plt.ylabel("Error")
+
+for i, delta_squared_val in enumerate(delta_squared_values):
+    plt.plot(range(iterations + 1), errors_F2_varied[i], label=f"delta_squared = {delta_squared_val}", alpha=0.7)
+
+plt.legend()
+plt.show()
