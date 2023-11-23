@@ -66,16 +66,14 @@ solutions_F = gradient_descent_tracking(cost_function_F, initial_guess, learning
 solutions_F2 = gradient_descent_tracking(cost_function_F2, initial_guess, learning_rate, iterations, delta_squared)
 
 
-# Crear la variable num_iterations para el rango de iteraciones
 num_iterations = range(iterations + 1)  # Iteraciones + solución inicial
 
 # Obtener los valores de la función de costo a lo largo de las iteraciones para F y F2
 cost_values_F = [cost_function_F(sol) for sol in solutions_F]
 cost_values_F2 = [cost_function_F2(sol, delta_squared) for sol in solutions_F2]
 
-# Obtener los valores de la función de costo a lo largo de las iteraciones para SVD
+# Obtener los valores de la función de costo a lo largo de las iteraciones para SVD con F y F2
 cost_values_svd = [cost_function_F(solution_svd)] * (iterations + 1)
-# Obtener los valores de la función de costo 2 a lo largo de las iteraciones para SVD
 cost_values_svd2 = [cost_function_F2(solution_svd, delta_squared)] * (iterations + 1)
 
 # Graficar la función de costo a lo largo de las iteraciones para F, F2 y SVD
@@ -83,7 +81,6 @@ plt.figure(figsize=(10, 6))
 plt.title("Valor de la función de costo a lo largo de las iteraciones")
 plt.xlabel("Iteración")
 plt.ylabel("Valor de la función de costo")
-
 plt.plot(num_iterations, cost_values_F, label="Costo (F)", alpha=0.7)
 plt.plot(num_iterations, cost_values_F2, label="Costo (F2)", alpha=0.7)
 plt.plot(num_iterations, cost_values_svd, label="Costo (SVD)", alpha=0.7)
@@ -91,30 +88,28 @@ plt.plot(num_iterations, cost_values_svd2, label="Costo (SVD2)", alpha=0.7)
 plt.legend()
 plt.show()
 
-
-
+#Error ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Calcular el error respecto al mínimo encontrado por el método
 error_F = np.array(cost_values_F) - cost_function_F(solution_F)
 error_F2 = np.array(cost_values_F2) - cost_function_F2(solution_F2, delta_squared)
+error_svd = np.array(cost_values_svd) - cost_function_F(solution_svd)
+error_svd2 = np.array(cost_values_svd2) - cost_function_F2(solution_svd, delta_squared)
 
-# Graficar la convergencia del error para F y F2
+# Graficar la convergencia del error para F, F2 y SVD
 plt.figure(figsize=(10, 6))
-plt.title("Convergencia del error (F)")
+plt.title("Convergencia del error (F, F2, SVD)")
 plt.xlabel("Iteración")
 plt.ylabel("Error")
 plt.plot(num_iterations, error_F, label="Error (F)", alpha=0.7)
-plt.legend()
-plt.show()
-
-plt.figure(figsize=(10, 6))
-plt.title("Convergencia del error con regularización L2 (F2)")
-plt.xlabel("Iteración")
-plt.ylabel("Error")
 plt.plot(num_iterations, error_F2, label="Error (F2)", alpha=0.7)
+error_svd = np.array(cost_values_svd) - cost_function_F(solution_svd)
+error_svd2 = np.array(cost_values_svd2) - cost_function_F2(solution_svd, delta_squared)
+plt.plot(num_iterations, error_svd, label="Error (SVD)", alpha=0.7)
 plt.legend()
 plt.show()
 
-# Realizar un estudio variando delta_squared
+
+# Variando delta------------------------------------------------------------------------------------------------------------------------------------------
 delta_squared_values = [1e-4, 1e-2, 1,50,100,1000,15000]  # Valores de delta_squared a probar
 
 errors_F2_varied = []  # Almacenar los errores para cada valor de delta_squared
