@@ -139,7 +139,7 @@ plt.show()
 
 #Variando S -------------------------------------------------------------------------------------------------------------
 # Definir los valores para S en un rango alrededor de 1/λmax
-S_values = np.linspace(1/(2 * S[0]), 2 * (1/S[0]), num=10)  # 10 valores entre 1/(2*λmax) y 2*(1/λmax)
+S_values = np.linspace(1/(2 * S[0]), 2 * (1/S[0]), num=5)  # 10 valores entre 1/(2*λmax) y 2*(1/λmax)
 
 errors_S_varied = []  # Almacenar los errores para cada valor de S
 solutions_S_varied = []  # Almacenar las soluciones para cada valor de S
