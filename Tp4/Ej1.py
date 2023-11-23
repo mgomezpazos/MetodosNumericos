@@ -135,3 +135,36 @@ for i, delta_squared_val in enumerate(delta_squared_values):
 
 plt.legend()
 plt.show()
+
+
+#Variando S -------------------------------------------------------------------------------------------------------------
+# Definir los valores para S en un rango alrededor de 1/λmax
+S_values = np.linspace(1/(2 * S[0]), 2 * (1/S[0]), num=10)  # 10 valores entre 1/(2*λmax) y 2*(1/λmax)
+
+errors_S_varied = []  # Almacenar los errores para cada valor de S
+solutions_S_varied = []  # Almacenar las soluciones para cada valor de S
+
+for S_val in S_values:
+    # Calcular el learning rate basado en el valor de S
+    learning_rate_S = S_val
+
+    # Ejecutar el gradiente descendente con el nuevo learning rate
+    solution_S_val = gradient_descent(cost_function_F, initial_guess, learning_rate_S, iterations)
+
+    # Almacenar la solución y calcular el error
+    solutions_S_varied.append(solution_S_val)
+    cost_values_S_val = [cost_function_F(sol) for sol in gradient_descent_tracking(
+        cost_function_F, initial_guess, learning_rate_S, iterations)]
+    errors_S_varied.append(np.array(cost_values_S_val) - cost_function_F(solution_S_val))
+
+# Graficar la convergencia del error para diferentes valores de S
+plt.figure(figsize=(10, 6))
+plt.title("Convergencia del error con diferentes valores de S")
+plt.xlabel("Iteración")
+plt.ylabel("Error")
+
+for i, S_val in enumerate(S_values):
+    plt.plot(range(iterations + 1), errors_S_varied[i], label=f"S = {S_val:.3f}", alpha=0.7)
+
+plt.legend()
+plt.show()
