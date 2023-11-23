@@ -69,53 +69,28 @@ solutions_F2 = gradient_descent_tracking(cost_function_F2, initial_guess, learni
 # Crear la variable num_iterations para el rango de iteraciones
 num_iterations = range(iterations + 1)  # Iteraciones + solución inicial
 
-# Graficar la evolución de las primeras 5 dimensiones de la solución para F
-num_dimensions_to_plot = 5
-plt.figure(figsize=(10, 6))
-plt.title("Evolución de las primeras 5 dimensiones de la solución (F)")
-plt.xlabel("Iteración")
-plt.ylabel("Valor de la solución")
-
-for i in range(num_dimensions_to_plot):
-    sol_values = [sol[i] for sol in solutions_F]
-    plt.plot(num_iterations, sol_values, label=f"x[{i}] (F)", alpha=0.7)
-plt.legend()
-plt.show()
-
-# Graficar la evolución de las primeras 5 dimensiones de la solución para F2
-plt.figure(figsize=(10, 6))
-plt.title("Evolución de las primeras 5 dimensiones de la solución con regularización L2 (F2)")
-plt.xlabel("Iteración")
-plt.ylabel("Valor de la solución")
-
-for i in range(num_dimensions_to_plot):
-    sol_values = [sol[i] for sol in solutions_F2]
-    plt.plot(num_iterations, sol_values, label=f"x[{i}] (F2)", alpha=0.7)
-plt.legend()
-plt.show()
-
-
 # Obtener los valores de la función de costo a lo largo de las iteraciones para F y F2
 cost_values_F = [cost_function_F(sol) for sol in solutions_F]
 cost_values_F2 = [cost_function_F2(sol, delta_squared) for sol in solutions_F2]
 
-# Graficar la función de costo a lo largo de las iteraciones para F
+# Obtener los valores de la función de costo a lo largo de las iteraciones para SVD
+cost_values_svd = [cost_function_F(solution_svd)] * (iterations + 1)
+# Obtener los valores de la función de costo 2 a lo largo de las iteraciones para SVD
+cost_values_svd2 = [cost_function_F2(solution_svd, delta_squared)] * (iterations + 1)
+
+# Graficar la función de costo a lo largo de las iteraciones para F, F2 y SVD
 plt.figure(figsize=(10, 6))
-plt.title("Valor de la función de costo (F) a lo largo de las iteraciones")
+plt.title("Valor de la función de costo a lo largo de las iteraciones")
 plt.xlabel("Iteración")
 plt.ylabel("Valor de la función de costo")
+
 plt.plot(num_iterations, cost_values_F, label="Costo (F)", alpha=0.7)
+plt.plot(num_iterations, cost_values_F2, label="Costo (F2)", alpha=0.7)
+plt.plot(num_iterations, cost_values_svd, label="Costo (SVD)", alpha=0.7)
+plt.plot(num_iterations, cost_values_svd2, label="Costo (SVD2)", alpha=0.7)
 plt.legend()
 plt.show()
 
-# Graficar la función de costo a lo largo de las iteraciones para F2
-plt.figure(figsize=(10, 6))
-plt.title("Valor de la función de costo con regularización L2 (F2) a lo largo de las iteraciones")
-plt.xlabel("Iteración")
-plt.ylabel("Valor de la función de costo")
-plt.plot(num_iterations, cost_values_F2, label="Costo (F2)", alpha=0.7)
-plt.legend()
-plt.show()
 
 
 # Calcular el error respecto al mínimo encontrado por el método
