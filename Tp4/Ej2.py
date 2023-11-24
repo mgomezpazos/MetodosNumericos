@@ -5,10 +5,16 @@ import pandas as pd
 # Leer datos desde el archivo CSV
 data = pd.read_csv('retornos_historicos.csv', header=None)
 
-# Aquí solo se proporciona una matriz de ejemplo para demostración, deberás cargar tus datos reales.
-returns_matrix = np.random.rand(24, 100)
+# Ignorar la primera fila
+returns_matrix = data.iloc[1:].values
 
-# Parámetros
+# Reemplazar las comas por puntos y convertir a números de punto flotante
+returns_matrix = np.array([[float(cell.replace(',', '.')) for cell in row] for row in returns_matrix])
+
+# Imprimir la matriz de retornos para verificar
+print("Matriz de Retornos:")
+print(returns_matrix)
+
 r_min_values = [0.02, 0.03, 0.04]  # Diferentes valores de r_min
 
 # Iterar sobre los diferentes valores de r_min
